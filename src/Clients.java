@@ -3,7 +3,6 @@ import java.io.*;
 import java.io.Console;
 import java.sql.*;
 import oracle.jdbc.driver.*;
-import oracle.sql.*;
 
 public class Clients
 {
@@ -25,7 +24,7 @@ public class Clients
 
 		System.out.print("1 -->> Customer \n" +
 				"2 -->> Technician  \n" +
-				"3 -->> Manager\n" +
+				"3 -->> Administrator\n" +
 				"-1 -->> Exit\n" +
 				"Please enter the number of your position:");
 		Scanner pos = new Scanner(System.in);
@@ -45,7 +44,7 @@ public class Clients
 				}
 
 				case 3 -> {
-					new Manager(conn);
+					new Administrator(conn);
 				}
 				case 4 -> {
 					break;
