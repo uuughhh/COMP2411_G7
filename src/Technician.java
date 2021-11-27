@@ -17,72 +17,89 @@ public class Technician {
         while (run) {
         System.out.print("1 -->> Get your refill invoice \n" +
                 "2 -->> Get a list of job to be done  \n" +
+                "3 -->> Get the location of your warehouse  \n" +
                 "-1 -->> Exit\n" +
                 "Please select the type of query you like to make:\n");
         Scanner operation = new Scanner(System.in);
         int operationNum;
             if (operation.hasNextLine()) {
                 operationNum = Integer.parseInt(operation.nextLine());
-                switch (operationNum) {
+                try{
+                    switch (operationNum) {
 
-                    case 1 -> {this.getRefillInvoice(stmt);}
+                        case 1 -> {this.getRefillInvoice(stmt);}
 
-                    case 2 -> {
-                        System.out.print("If you want to check the jobs of a certain machine, please enter its name, else enter 1 to check all.");
-                        Scanner machine = new Scanner(System.in);
-                        if (machine.nextLine().equals("1")) this.getJobs(stmt);
-                        else this.getJobs(machine.nextLine(), stmt);
+                        case 2 -> {
+                            this.getJobs(stmt);
 
-                        System.out.print("Enter the Job id number if you want to set a job as done. Enter -1 to exit.");
-                        Scanner job = new Scanner(System.in);
-                        this.setJobDone(job.nextLine(), stmt);
-                        System.out.print("The job has been set as finished.");
+                            System.out.print("Enter the Job id number if you want to set a job as done. Enter -1 to exit.");
+                            Scanner job = new Scanner(System.in);
+                            this.setJobDone(job.nextLine(), stmt);
+                            System.out.print("The job has been set as finished.");
+                        }
+
+                        case 3 -> {
+                            this.getLocation(stmt);
+                        }
+
+                        case -1 -> run = false;
+                        default -> throw new IllegalArgumentException("Please enter a legit number.");
                     }
-
-                    case -1 -> run = false;
-                    default -> throw new IllegalArgumentException("Please enter a legit number.");
-                }
+                } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
             }
         }
     }
 
-    public void getRefillInvoice (Statement statement) throws SQLException {
-        ResultSet rset = statement.executeQuery("SELECT * FROM RefillInvoices WHERE Technician_id = "+ id);
-        while (rset.next())
-        {
+    public void getRefillInvoice (Statement statement) {
+        try {
+            ResultSet rset = statement.executeQuery("SELECT * FROM RefillInvoices WHERE Technician_id = "+ id);
+            while (rset.next())
+            {
 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
     }
 
-    public void getJobs (Statement statement) throws SQLException {
-        ResultSet rset = statement.executeQuery("SELECT * FROM Job");
-        while (rset.next())
-        {
+    public void getJobs (Statement statement)  {
+        try {
+            ResultSet rset = statement.executeQuery("SELECT * FROM Job WHERE TECHNICIANID ="+id);
+            while (rset.next())
+            {
 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    }
 
-    public void getJobs (String machineID,Statement statement) throws SQLException {
-        ResultSet rset = statement.executeQuery("SELECT * FROM Job WHERE Job_id = "+machineID);
-        int counter = 0;
-        while (rset.next())
-        {
-            counter++;
-        }
-        if (counter == 1) throw new IllegalArgumentException("Wrong machine number.");
-    }
-
-    public void setJobDone (String jobID,Statement statement) throws SQLException {
-        ResultSet rset = statement.executeQuery("SELECT * FROM Job WHERE Job_id = "+jobID+ "AND Status = ???");
-        int counter = 0;
-        while (rset.next())
-        {
-            counter++;
-        }
-        if (counter == 1) throw new IllegalArgumentException("Wrong Job ID number.");
-        //need to add to refill invoice too
     }
 
 
 
+    public void setJobDone (String jobID,Statement statement) {
+        try {
+            int rowNum0 = statement.executeUpdate("UPDATE Job SET Status = ??? WHERE Job_id = " + jobID);
+            if (rowNum0 == 0) throw new IllegalArgumentException("Wrong job ID.");
+            //need to add to refill invoice too
+            int rowNum1 = statement.executeUpdate("");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getLocation (Statement statement)  {
+        try {
+            ResultSet rset = statement.executeQuery("SELECT Location FROM Warehouse WHERE Job_id = "+
+                    id + "AND Status = ???");
+            while (rset.next())
+            {
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
