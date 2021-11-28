@@ -26,21 +26,35 @@ public class Technician {
                 try{
                     switch (operationNum) {
 
-                        case 1 -> this.getRefillInvoice();
+                        case 1 :
+                        {
+                            this.getRefillInvoice();
+                            break;
+                        }
 
-                        case 2 -> {
+                        case 2 : {
                             this.getTasks();
 
                             System.out.print("Enter the task id number if you want to set a job as done. Enter -1 to exit.");
                             Scanner job = new Scanner(System.in);
                             this.setJobDone(job.nextLine());
                             System.out.print("The task has been set as finished.");
+                            break;
                         }
 
-                        case 3 -> this.getLocation();
+                        case 3 :{
+                            this.getLocation();
+                            break;
+                        }
 
-                        case -1 -> run = false;
-                        default -> throw new IllegalArgumentException("Please enter a legit number.");
+                        case -1 :{
+
+                            run = false;
+                            break;
+                        }
+                        default :{
+                            throw new IllegalArgumentException("Please enter a legit number.");
+                        }
                     }
                 } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
             }
@@ -66,7 +80,6 @@ public class Technician {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public void getTasks()  {
@@ -85,7 +98,6 @@ public class Technician {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -100,7 +112,6 @@ public class Technician {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public void getLocation()  {
