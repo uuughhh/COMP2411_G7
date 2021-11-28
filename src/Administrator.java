@@ -784,9 +784,23 @@ public class Administrator {
         Scanner job_deadline = new Scanner(System.in);
 
 
-        System.out.println("Please enter new technician's ID assigned to the Job: ");
-        //todo check whether exists
+        pstmt = Conn.prepareStatement("SELECT Technician_ID FROM Technician");
+        rset = pstmt.executeQuery();
+
+        while (rset.next()) {
+            System.out.println(rset.getString(1));
+        }
+        System.out.println("Please enter new technician's ID assigned to the task: ");
         Scanner job_TID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Technician_ID FROM  Technician " +
+                "WHERE Technician_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(job_TID.toString()));
+        rset = pstmt.executeQuery();
+
+        while (rset == null){
+            System.out.println("Technician does not exist");
+            job_TID = new Scanner(System.in);
+        }
 
         String date=java.time.LocalDate.now().toString();
         //todo check format
