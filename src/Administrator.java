@@ -1,5 +1,6 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.sql.Date;
 import java.util.*;
 import java.io.*;
 import java.io.Console;
@@ -336,9 +337,10 @@ public class Administrator {
 
     public void checkMStock(String machineNum)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Quantity FROM Vending_Machine_Stock"
-            + "WHERE Machine_ID = "+ machineNum);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            pstmt = Conn.prepareStatement("SELECT Item_ID, Quantity FROM Vending_Machine_Stock WHERE Machine_ID = ?");
+            pstmt.setInt(1,Integer.parseInt(machineNum));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID or empty stock.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -354,9 +356,11 @@ public class Administrator {
 
     public void checkMachineRefill (String machineNum)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT Refill_ID, Warehouse_ID, Item_ID, Quantity, Refill_Date, Technician_ID" +
-                    "FROM Refill_Invoice" + "WHERE Machine_ID = "+ machineNum);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            pstmt = Conn.prepareStatement("SELECT Refill_ID, Warehouse_ID, Item_ID, Quantity, Refill_Date, Technician_ID" +
+                    "FROM Refill_Invoice" + "WHERE Machine_ID = ?");
+            pstmt.setInt(1,Integer.parseInt(machineNum));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID or empty refill invoice.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -388,14 +392,17 @@ public class Administrator {
         try {
             ResultSet rset;
             if (isDate(idORdate)){
-                DATE date = new DATE(idORdate);
-                rset = stmt.executeQuery("SELECT Purchase_ID, Item_ID, Vending_Machine_ID FROM Purchase_Invoice"+
-                        "WHERE Purchase_Date = "+ date);
+                pstmt = Conn.prepareStatement("SELECT Purchase_ID, Item_ID, Vending_Machine_ID FROM Purchase_Invoice"+
+                        "WHERE Purchase_Date = ?");
+                pstmt.setDate(1, Date.valueOf(idORdate));
+                rset = pstmt.executeQuery();
             } else {
-                rset = stmt.executeQuery("SELECT Purchase_ID, Item_ID, Purchase_Date FROM Purchase_Invoice"+
-                    "WHERE Vending_Machine_ID = "+ idORdate);
+                pstmt = Conn.prepareStatement("SELECT Purchase_ID, Item_ID, Purchase_Date FROM Purchase_Invoice"+
+                        "WHERE Vending_Machine_ID = ?");
+                pstmt.setInt(1, Integer.parseInt(idORdate));
+                rset = pstmt.executeQuery();
             }
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong input.");
+            if (!rset.next()) throw new IllegalArgumentException("Wrong input.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -414,7 +421,8 @@ public class Administrator {
 
     public void checkWhouse (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Warehouse");
+            pstmt = Conn.prepareStatement("SELECT * FROM Warehouse");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -428,7 +436,8 @@ public class Administrator {
 
     public void checkWStock (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Warehouse_Stock ");
+            pstmt = Conn.prepareStatement("SELECT * FROM Warehouse_Stock");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -444,9 +453,11 @@ public class Administrator {
 
     public void checkWStock (String houseNum){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Quantity FROM Warehouse_Stock " +
-                    "WHERE Warehouse_ID = "+houseNum);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            pstmt = Conn.prepareStatement("SELECT Item_ID, Quantity FROM Warehouse_Stock " +
+                    "WHERE Warehouse_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(houseNum));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("Wrong warehouse Id or empty stock.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -460,7 +471,8 @@ public class Administrator {
 
     public void checkSupp (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Supplier");
+            pstmt = Conn.prepareStatement("SELECT * FROM Supplier");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -475,7 +487,8 @@ public class Administrator {
 
     public void checkItem (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Item");
+            pstmt = Conn.prepareStatement("SELECT * FROM Item");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -492,9 +505,11 @@ public class Administrator {
 
     public void checkItem (String supp){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Item_Name, Sell_Price" +
-                    " FROM Item WHERE Supplier = "+supp);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            pstmt = Conn.prepareStatement("SELECT Item_ID, Item_Name, Sell_Price" +
+                    " FROM Item WHERE Supplier = ?");
+            pstmt.setInt(1, Integer.parseInt(supp));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("Wrong supplier id or it has no item.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -509,7 +524,8 @@ public class Administrator {
 
     public void checkTechnician (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Technician");
+            pstmt = Conn.prepareStatement("SELECT * FROM Technician");
+            ResultSet rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -519,9 +535,12 @@ public class Administrator {
 
     public void checkTasks(String techID)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Task " +
-                    "WHERE Technician_Assigned_ID ="+techID);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            pstmt = Conn.prepareStatement("SELECT * FROM Task " +
+                    "WHERE Technician_Assigned_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(techID));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException
+                    ("Wrong technician ID or no task has been assigned.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -538,7 +557,8 @@ public class Administrator {
 
     public void checkTasks(){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Task");
+            pstmt = Conn.prepareStatement("SELECT * FROM Task");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -557,8 +577,12 @@ public class Administrator {
 
     public void checkTechRefill(String techID){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM Refill_Invoice " +
-                    "WHERE Technician_ID ="+techID);
+            pstmt = Conn.prepareStatement("SELECT * FROM Refill_Invoice " +
+                    "WHERE Technician_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(techID));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException
+                    ("Wrong technician ID or no refill invoice.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
@@ -577,8 +601,9 @@ public class Administrator {
 
     public void otherQuery(String query)  {
         try {
-            ResultSet rset = stmt.executeQuery(query);
-            if (rset.toString().equals("")) throw new IllegalArgumentException("NO results.");
+            pstmt = Conn.prepareStatement(query);
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("NO results.");
             int columnNum = rset.getMetaData().getColumnCount();
             while (rset.next())
             {
@@ -590,7 +615,5 @@ public class Administrator {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
-
 }
