@@ -532,10 +532,15 @@ public class Administrator {
         System.out.println(rset.getString(1));
         // just id numbers of warehouses
         System.out.println("Please select on of the new machine's warehouse ids above: ");
+        //todo input validation
 
         Scanner machine_WID = new Scanner(System.in);
-        System.out.println("Please enter new machine's status: ");
-        //todo its limited number, add choices with names
+        System.out.println("In Service \n" +
+                "Out of Order \n" +
+                "In Repair \n" +
+                "Empty \n" +
+                "Please select new machine's status from the above: ");
+        //todo input validation
         Scanner machine_status = new Scanner(System.in);
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
@@ -570,14 +575,19 @@ public class Administrator {
 
         System.out.println("Please enter new item's name: ");
         Scanner item_name = new Scanner(System.in);
-        System.out.println("Please enter new item's supplier id: ");
-        //todo its limited number, add choices with names
+
+        pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier");
+        ResultSet rset = pstmt.executeQuery();
+        System.out.println(rset.getString(1));
+        System.out.println("Please choose new item's supplier id from the above: ");
+        //todo input validation
         Scanner item_SID = new Scanner(System.in);
+
         System.out.println("Please enter new item's price: ");
         Scanner item_pr = new Scanner(System.in);
         try {
             pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
-            ResultSet rset = pstmt.executeQuery();
+            ResultSet rset1 = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -587,7 +597,6 @@ public class Administrator {
     public void deleteItem(String item_ID){
         //todo only if its not available in machines (quantity == 0)
         try {
-            //todo should i delete delivery invoices
             pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item_ID);
             ResultSet rset = pstmt.executeQuery();
             pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID= " + item_ID);
@@ -610,12 +619,18 @@ public class Administrator {
 
         System.out.println("Please enter new technician's name: ");
         Scanner technician_name = new Scanner(System.in);
-        System.out.println("Please enter new technician's warehouse id: ");
-        //todo its limited number, add choices with names
+
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM  Warehouse");
+        ResultSet rset = pstmt.executeQuery();
+        System.out.println(rset.getString(1));
+        System.out.println("Please choose new technician's warehouse id from the above: ");
+        //todo input validation
         Scanner technician_WID = new Scanner(System.in);
+
+
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
-            ResultSet rset = pstmt.executeQuery();
+            ResultSet rset1 = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -624,9 +639,11 @@ public class Administrator {
 
     public void deleteTechnician(String technician_ID){
         try {
+            pstmt = Conn.prepareStatement("UPDATE Task SET Task_Status  = "
+                    + "'To be assigned' WHERE Task_ID = " + technician_ID);
+            ResultSet rset1 = pstmt.executeQuery();
             pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= " + technician_ID);
             ResultSet rset = pstmt.executeQuery();
-            //todo change status of assigned tasks to "To be assigned"
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
