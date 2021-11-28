@@ -1,6 +1,6 @@
 import java.util.*;
 import java.sql.*;
-
+import java.time.LocalTime;
 import oracle.jdbc.OracleConnection;
 
 public class Administrator {
@@ -646,13 +646,13 @@ public class Administrator {
         Scanner job_type = new Scanner(System.in);
         System.out.println("Please enter new Job's deadline: ");
         Scanner job_deadline = new Scanner(System.in);
-        //todo date is today and status to do
         System.out.println("Please enter new technician's ID assigned to the Job: ");
         //todo check whether exists
         Scanner job_TID = new Scanner(System.in);
+        String date=java.time.LocalDate.now().toString();
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +job_ID+", "+ date + job_type+", "
-                    +job_deadline+", "+status+", "+job_TID+", "+")");
+                    +job_deadline+", "+"'To be assigned'"+", "+job_TID+", "+")");
             ResultSet rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
