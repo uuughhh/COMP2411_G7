@@ -526,8 +526,13 @@ public class Administrator {
         Scanner machine_adress = new Scanner(System.in);
         System.out.println("Please enter new machine's number of slots: ");
         Scanner machine_NumOfS = new Scanner(System.in);
-        System.out.println("Please enter new machine's warehouse id: ");
-        //todo its limited number, add choices with names
+
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM  Warehouse");
+        ResultSet rset = pstmt.executeQuery();
+        System.out.println(rset.getString(1));
+        // just id numbers of warehouses
+        System.out.println("Please select on of the new machine's warehouse ids above: ");
+
         Scanner machine_WID = new Scanner(System.in);
         System.out.println("Please enter new machine's status: ");
         //todo its limited number, add choices with names
@@ -535,7 +540,7 @@ public class Administrator {
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
                     machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
-            ResultSet rset = pstmt.executeQuery();
+            rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
