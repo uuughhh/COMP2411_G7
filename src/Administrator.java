@@ -94,7 +94,7 @@ public class Administrator {
 
                     default -> throw new IllegalArgumentException("Please enter a legit number.");
                 }
-            } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
+            } catch (IllegalArgumentException | SQLException e){System.out.println(e.getMessage());}
         }
     }
 
