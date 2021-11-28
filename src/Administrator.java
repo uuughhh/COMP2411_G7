@@ -248,7 +248,7 @@ public class Administrator {
                     "ON Vending_Machine_Stock.Refill_ID = Refill_Invoice.Refill_ID)");
             pstmt.setInt(1,Integer.parseInt(machineNum));
             ResultSet rset = pstmt.executeQuery();
-            if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID or empty stock.");
+            if (!rset.next()) throw new IllegalArgumentException("Wrong address or empty stock in the machine.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)

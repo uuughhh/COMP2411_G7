@@ -33,26 +33,20 @@ public class Clients
 		if (pos.hasNextLine()) posNum = Integer.parseInt(pos.nextLine());
 
 		switch (posNum){
-			case 1 -> {
-				new Customer(conn);
-			}
+			case 1 -> {new Customer(conn);}
 
-				case 2 -> {
+			case 2 -> {
 					System.out.print("Please enter your Technician id:");
 					Scanner id = new Scanner(System.in);
 					String idNum = null;
 					if (id.hasNextLine()) idNum = pos.nextLine();
 					new Technician(idNum, conn);
-				}
-
-				case 3 -> {
-					new Administrator(conn);
-				}
-				case 4 -> {
-					break;
-				}
-				default -> throw new IllegalArgumentException("Please enter a legit number.");
 			}
+
+			case 3 -> {new Administrator(conn);}
+			case 4 -> {break;}
+			default -> {throw new IllegalArgumentException("Please enter a legit number.");}
+		}
 		conn.close();
 		System.out.println("The execution of the application has ended.");
 
