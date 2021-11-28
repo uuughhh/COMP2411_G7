@@ -13,7 +13,8 @@ public class Technician {
         this.Conn = Conn;
         boolean run = true;
         while (run) {
-        System.out.print("1 -->> Get your refill invoice \n" +
+        System.out.print(
+                "1 -->> Get your refill invoice \n" +
                 "2 -->> Get a list of task to be done  \n" +
                 "3 -->> Get the location of your warehouse  \n" +
                 "-1 -->> Exit\n" +
@@ -25,7 +26,7 @@ public class Technician {
                 try{
                     switch (operationNum) {
 
-                        case 1 -> {this.getRefillInvoice();}
+                        case 1 -> this.getRefillInvoice();
 
                         case 2 -> {
                             this.getTasks();
@@ -36,9 +37,8 @@ public class Technician {
                             System.out.print("The task has been set as finished.");
                         }
 
-                        case 3 -> {
-                            this.getLocation();
-                        }
+                        case 3 -> this.getLocation();
+
 
                         case -1 -> run = false;
                         default -> throw new IllegalArgumentException("Please enter a legit number.");
@@ -50,7 +50,9 @@ public class Technician {
 
     public void getRefillInvoice() {
         try {
-            pstmt = Conn.prepareStatement("SELECT * FROM Refill_Invoice WHERE Technician_ID = ?");
+            pstmt = Conn.prepareStatement("SELECT Refill_Invoice.Refill_ID, Delivery_Invoice.Item_ID, Refill_Invoice.Machine_ID, Refill_Invoice.Quantity, Refill_Invoice.Refill_Date " +
+                    "FROM Refill_Invoice, Delivery_Invoice " +
+                    "WHERE Refill_Invoice.Technician_ID = ? AND Refill_Invoice.Delivery_ID = Delivery_Invoice.Delivery_ID");
             pstmt.setInt(1,Integer.parseInt(id));
             ResultSet rset = pstmt.executeQuery();
             while (rset.next())
@@ -91,7 +93,7 @@ public class Technician {
 
     public void setJobDone(String jobID) {
         try {
-            pstmt = Conn.prepareStatement("UPDATE Job SET Status = ? WHERE Job_id = ?");
+            pstmt = Conn.prepareStatement("UPDATE Task SET Status = ? WHERE Job_id = ?");
             pstmt.setString(1,"Completed");
             pstmt.setInt(2,Integer.parseInt(jobID));
             int rowNum0 = pstmt.executeUpdate();
@@ -104,7 +106,7 @@ public class Technician {
 
     public void getLocation()  {
         try {
-            pstmt = Conn.prepareStatement("SELECT Adress FROM Warehouse WHERE Warehouse.Warehouse_ID =" +
+            pstmt = Conn.prepareStatement("SELECT Adress FROM Warehouse WHERE Warehouse.Warehouse_ID = " +
                     "(SELECT Warehouse_ID FROM Technician WHERE Technician_ID = ?");
             pstmt.setInt(1,Integer.parseInt(id));
             ResultSet rset = pstmt.executeQuery();
