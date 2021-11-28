@@ -530,6 +530,9 @@ public class Administrator {
         System.out.println("Please enter new machine's number of slots: ");
         Scanner machine_NumOfS = new Scanner(System.in);
 
+
+
+
         pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse");
         rset = pstmt.executeQuery();
 
@@ -592,27 +595,58 @@ public class Administrator {
         System.out.println("Please enter new item's id: ");
 
         Scanner item_ID = new Scanner(System.in);
-        pstmt = Conn.prepareStatement("SELECT Item_ID WHERE Item_ID = " + item_ID + "FROM Item");
-        // check whether it already exists
-        while (pstmt != null){
+
+        pstmt = Conn.prepareStatement("SELECT * FROM Item " +
+                "WHERE Item_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(item_ID.toString()));
+        ResultSet rset = pstmt.executeQuery();
+
+        while (rset != null){
             System.out.println("ID already exists, please enter another number: ");
             item_ID = new Scanner(System.in);}
 
         System.out.println("Please enter new item's name: ");
         Scanner item_name = new Scanner(System.in);
 
+
+
         pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier");
-        ResultSet rset = pstmt.executeQuery();
-        System.out.println(rset.getString(1));
-        System.out.println("Please choose new item's supplier id from the above: ");
-        //todo input validation
+        rset = pstmt.executeQuery();
+
+        while (rset.next()) {
+            System.out.println(rset.getString(1));
+        }
+        System.out.println("Please select on of the new item's supplier id above: ");
         Scanner item_SID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier " +
+                "WHERE Supplier_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(item_SID.toString()));
+        rset = pstmt.executeQuery();
+
+        while (rset == null){
+            System.out.println("Supplier does not exist");
+            item_SID = new Scanner(System.in);
+        }
+
+        /*pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier");
+        rset = pstmt.executeQuery();
+        while (rset.next()) {
+            System.out.println(rset.getString(1));
+        }
+        System.out.println("Please choose new item's supplier id from the above: ");
+        Scanner item_SID = new Scanner(System.in);*/
 
         System.out.println("Please enter new item's price: ");
         Scanner item_pr = new Scanner(System.in);
+
+
         try {
-            pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
-            ResultSet rset1 = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(?, ?, ?, ?, ?)");
+            pstmt.setInt(1, Integer.parseInt(item_ID.toString()));
+            pstmt.setString(2, item_name.toString());
+            pstmt.setInt(3, Integer.parseInt(item_SID.toString()));
+            pstmt.setInt(4, Integer.parseInt(item_pr.toString()));
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -645,7 +679,7 @@ public class Administrator {
         System.out.println("Please enter new technician's name: ");
         Scanner technician_name = new Scanner(System.in);
 
-        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM  Warehouse");
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse");
         ResultSet rset = pstmt.executeQuery();
         System.out.println(rset.getString(1));
         System.out.println("Please choose new technician's warehouse id from the above: ");
