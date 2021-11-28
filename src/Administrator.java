@@ -45,11 +45,11 @@ public class Administrator {
 
     public void updates (){
         System.out.print("1 -->> Change information about vending machines \n" +
-                "2 -->> Change Available Items\n" +
-                "3 -->> Change Jobs\n" +
-                "4 -->> Change Technicians\n" +
-                "5 -->> Change Suppliers\n" +
-                "Please choose an option to execute:");
+                "   2 -->> Change Available Items\n" +
+                "   3 -->> Change Jobs\n" +
+                "   4 -->> Change Technicians\n" +
+                "   5 -->> Change Suppliers\n" +
+                "   Please choose an option to execute:");
         Scanner operation = new Scanner(System.in);
         int num;
         if (operation.hasNextLine()) {
@@ -73,9 +73,9 @@ public class Administrator {
                             System.out.println("Please enter new machine's status: ");
                             Scanner machine_status = new Scanner(System.in);
                             try {
-                                ResultSet rset = stmt.executeQuery("INSERT INTO Vending_Machine VALUES(" +
+                                pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
                                         machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
-
+                                ResultSet rset = pstmt.executeQuery();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -83,8 +83,9 @@ public class Administrator {
                         }
                         else {
                             try {
-                                ResultSet rset = stmt.executeQuery("UPDATE Vending_Machine SET chk_Machine_Status  = "
+                                pstmt = Conn.prepareStatement("UPDATE Vending_Machine SET chk_Machine_Status  = "
                                         + "'Out of Order' WHERE Vending_Machine_ID = " + machine);
+                                ResultSet rset = pstmt.executeQuery();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -108,7 +109,8 @@ public class Administrator {
                             System.out.println("Please enter new item's price: ");
                             Scanner item_pr = new Scanner(System.in);
                             try {
-                                ResultSet rset = stmt.executeQuery("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
+                                pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
+                                ResultSet rset = pstmt.executeQuery();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -118,8 +120,10 @@ public class Administrator {
                             //todo only if its not available in machines (quantity == 0)
                             try {
                                 //todo should i delete delivery invoices
-                                ResultSet rset = stmt.executeQuery("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item);
-                                ResultSet rset1 = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
+                                pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item);
+                                ResultSet rset = pstmt.executeQuery();
+                                pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID= " + item);
+                                ResultSet rset1 = pstmt.executeQuery();
                         } catch (SQLException e) {
                             e.printStackTrace();
                             System.out.println("Something is wrong with SQL.");
@@ -145,7 +149,8 @@ public class Administrator {
                             System.out.println("Please enter new technician's warehouse id: ");
                             Scanner technician_WID = new Scanner(System.in);
                             try {
-                                ResultSet rset = stmt.executeQuery("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
+                                pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
+                                ResultSet rset = pstmt.executeQuery();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -153,7 +158,8 @@ public class Administrator {
                         }
                         else {
                             try {
-                                ResultSet rset = stmt.executeQuery("DELETE FROM Technician WHERE Technician_ID= " + technician);
+                                pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= " + technician);
+                                ResultSet rset = pstmt.executeQuery();
                                 //todo change status of assigned tasks to "To be assigned"
                             } catch (SQLException e) {
                                 e.printStackTrace();
@@ -173,7 +179,8 @@ public class Administrator {
                             System.out.println("Please enter new Supplier's name: ");
                             Scanner supplier_name = new Scanner(System.in);
                             try {
-                                ResultSet rset = stmt.executeQuery("INSERT INTO Supplier VALUES(" +supplier_ID+", "+ supplier_name+")");
+                                pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +supplier_ID+", "+ supplier_name+")");
+                                ResultSet rset = pstmt.executeQuery();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -181,8 +188,10 @@ public class Administrator {
                         }
                         else {
                             try {
-                                ResultSet rset = stmt.executeQuery("DELETE FROM Item WHERE Supplier_ID= " + supplier);
-                                ResultSet rset1 = stmt.executeQuery("DELETE FROM Supplier WHERE Supplier_ID= " + supplier);
+                                pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Supplier_ID= " + supplier);
+                                ResultSet rset = pstmt.executeQuery();
+                                pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID= " + supplier);
+                                ResultSet rset1 = pstmt.executeQuery();
                                 //todo maybe create separate function to delete items bc it will be used above
                             } catch (SQLException e) {
                                 e.printStackTrace();
