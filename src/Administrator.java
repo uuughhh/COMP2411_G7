@@ -60,75 +60,17 @@ public class Administrator {
                         System.out.print("If you want to remove a certain machine, please enter its ID number, " +
                                 "else enter 1 to add new machine");
                         Scanner machine = new Scanner(System.in);
-                        if (machine.nextLine().equals("1")) {
-                            System.out.println("Please enter new machine's id: ");
-                            //todo check whether it already exists
-                            Scanner machine_ID = new Scanner(System.in);
-                            System.out.println("Please enter new machine's address: ");
-                            Scanner machine_adress = new Scanner(System.in);
-                            System.out.println("Please enter new machine's number of slots: ");
-                            Scanner machine_NumOfS = new Scanner(System.in);
-                            System.out.println("Please enter new machine's warehouse id: ");
-                            Scanner machine_WID = new Scanner(System.in);
-                            System.out.println("Please enter new machine's status: ");
-                            Scanner machine_status = new Scanner(System.in);
-                            try {
-                                pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
-                                        machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
-                                ResultSet rset = pstmt.executeQuery();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
-                        else {
-                            try {
-                                pstmt = Conn.prepareStatement("UPDATE Vending_Machine SET chk_Machine_Status  = "
-                                        + "'Out of Order' WHERE Vending_Machine_ID = " + machine);
-                                ResultSet rset = pstmt.executeQuery();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
-                        //todo should i add while loop for several updates in a row
+                        if (machine.nextLine().equals("1")) createMachine();
+                        else deleteMachine(machine.toString());
                     }
 
                     case 2 -> {
                         System.out.print("If you want to remove existing item, please enter its ID number, " +
                                 "else enter 1 to add new item");
                         Scanner item = new Scanner(System.in);
-                        if (item.nextLine().equals("1")) {
-                            System.out.println("Please enter new item's id: ");
-                            //todo check whether it already exists
-                            Scanner item_ID = new Scanner(System.in);
-                            System.out.println("Please enter new item's name: ");
-                            Scanner item_name = new Scanner(System.in);
-                            System.out.println("Please enter new item's supplier id: ");
-                            Scanner item_SID = new Scanner(System.in);
-                            System.out.println("Please enter new item's price: ");
-                            Scanner item_pr = new Scanner(System.in);
-                            try {
-                                pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
-                                ResultSet rset = pstmt.executeQuery();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
-                        else {
-                            //todo only if its not available in machines (quantity == 0)
-                            try {
-                                //todo should i delete delivery invoices
-                                pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item);
-                                ResultSet rset = pstmt.executeQuery();
-                                pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID= " + item);
-                                ResultSet rset1 = pstmt.executeQuery();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            System.out.println("Something is wrong with SQL.");
-                        }
-                        }
+                        if (item.nextLine().equals("1")) createItem();
+
+                        else deleteItem(item.toString());
                     }
 
                     case 3 -> {
@@ -140,64 +82,18 @@ public class Administrator {
                         System.out.print("If you want to remove technician, please enter their ID number, " +
                                 "else enter 1 to add new technician");
                         Scanner technician = new Scanner(System.in);
-                        if (technician.nextLine().equals("1")) {
-                            System.out.println("Please enter new technician's id: ");
-                            //todo check whether it already exists
-                            Scanner technician_ID = new Scanner(System.in);
-                            System.out.println("Please enter new technician's name: ");
-                            Scanner technician_name = new Scanner(System.in);
-                            System.out.println("Please enter new technician's warehouse id: ");
-                            Scanner technician_WID = new Scanner(System.in);
-                            try {
-                                pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
-                                ResultSet rset = pstmt.executeQuery();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
-                        else {
-                            try {
-                                pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= " + technician);
-                                ResultSet rset = pstmt.executeQuery();
-                                //todo change status of assigned tasks to "To be assigned"
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
+                        if (technician.nextLine().equals("1")) createTechnician();
+
+                        else deleteTechnician(technician.toString());
                     }
 
                     case 5 -> {
                         System.out.print("If you want to remove supplier, please enter their ID number, " +
                                 "else enter 1 to add new supplier");
                         Scanner supplier = new Scanner(System.in);
-                        if (supplier.nextLine().equals("1")) {
-                            System.out.println("Please enter new Supplier's id: ");
-                            //todo check whether it already exists
-                            Scanner supplier_ID = new Scanner(System.in);
-                            System.out.println("Please enter new Supplier's name: ");
-                            Scanner supplier_name = new Scanner(System.in);
-                            try {
-                                pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +supplier_ID+", "+ supplier_name+")");
-                                ResultSet rset = pstmt.executeQuery();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
-                        else {
-                            try {
-                                pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Supplier_ID= " + supplier);
-                                ResultSet rset = pstmt.executeQuery();
-                                pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID= " + supplier);
-                                ResultSet rset1 = pstmt.executeQuery();
-                                //todo maybe create separate function to delete items bc it will be used above
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
-                        }
+                        if (supplier.nextLine().equals("1")) createSupplier();
+
+                        else deleteSupplier(supplier.toString());
                     }
 
                     default -> throw new IllegalArgumentException("Please enter a legit number.");
@@ -627,6 +523,128 @@ public class Administrator {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void createMachine()  {
+        System.out.println("Please enter new machine's id: ");
+        //todo check whether it already exists
+        Scanner machine_ID = new Scanner(System.in);
+        System.out.println("Please enter new machine's address: ");
+        Scanner machine_adress = new Scanner(System.in);
+        System.out.println("Please enter new machine's number of slots: ");
+        Scanner machine_NumOfS = new Scanner(System.in);
+        System.out.println("Please enter new machine's warehouse id: ");
+        Scanner machine_WID = new Scanner(System.in);
+        System.out.println("Please enter new machine's status: ");
+        Scanner machine_status = new Scanner(System.in);
+        try {
+            pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
+                    machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void deleteMachine(String machine_ID){
+        try {
+            pstmt = Conn.prepareStatement("UPDATE Vending_Machine SET chk_Machine_Status  = "
+                    + "'Out of Order' WHERE Vending_Machine_ID = " + machine_ID);
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void createItem(){
+        System.out.println("Please enter new item's id: ");
+        //todo check whether it already exists
+        Scanner item_ID = new Scanner(System.in);
+        System.out.println("Please enter new item's name: ");
+        Scanner item_name = new Scanner(System.in);
+        System.out.println("Please enter new item's supplier id: ");
+        Scanner item_SID = new Scanner(System.in);
+        System.out.println("Please enter new item's price: ");
+        Scanner item_pr = new Scanner(System.in);
+        try {
+            pstmt = Conn.prepareStatement("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void deleteItem(String item_ID){
+        //todo only if its not available in machines (quantity == 0)
+        try {
+            //todo should i delete delivery invoices
+            pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item_ID);
+            ResultSet rset = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID= " + item_ID);
+            ResultSet rset1 = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void createTechnician(){
+        System.out.println("Please enter new technician's id: ");
+        //todo check whether it already exists
+        Scanner technician_ID = new Scanner(System.in);
+        System.out.println("Please enter new technician's name: ");
+        Scanner technician_name = new Scanner(System.in);
+        System.out.println("Please enter new technician's warehouse id: ");
+        Scanner technician_WID = new Scanner(System.in);
+        try {
+            pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void deleteTechnician(String technician_ID){
+        try {
+            pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= " + technician_ID);
+            ResultSet rset = pstmt.executeQuery();
+            //todo change status of assigned tasks to "To be assigned"
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void createSupplier(){
+        System.out.println("Please enter new Supplier's id: ");
+        //todo check whether it already exists
+        Scanner supplier_ID = new Scanner(System.in);
+        System.out.println("Please enter new Supplier's name: ");
+        Scanner supplier_name = new Scanner(System.in);
+        try {
+            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +supplier_ID+", "+ supplier_name+")");
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void deleteSupplier(String supplier_ID){
+        try {
+            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Supplier_ID= " + supplier_ID);
+            ResultSet rset = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID= " + supplier_ID);
+            ResultSet rset1 = pstmt.executeQuery();
+            //todo maybe create separate function to delete items bc it will be used above
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
         }
     }
 }
