@@ -581,9 +581,11 @@ public class Administrator {
     public void deleteMachine(String machine_ID){
         try {
             pstmt = Conn.prepareStatement("UPDATE Vending_Machine SET chk_Machine_Status  = "
-                    + "'Out of Order' WHERE Vending_Machine_ID = " + machine_ID);
-            ResultSet rset = pstmt.executeQuery();
-        } catch (SQLException e) {
+                    + "'Out of Order' WHERE Vending_Machine_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(machine_ID));
+            pstmt.executeUpdate();
+        }
+        catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
@@ -599,7 +601,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(item_ID.toString()));
         ResultSet rset = pstmt.executeQuery();
 
-        while (rset != null){
+        while (rset.next()){
             System.out.println("ID already exists, please enter another number: ");
             item_ID = new Scanner(System.in);}
 
@@ -619,7 +621,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(item_SID.toString()));
         rset = pstmt.executeQuery();
 
-        while (rset == null){
+        while (!rset.next()){
             System.out.println("Supplier does not exist");
             item_SID = new Scanner(System.in);
         }
@@ -644,10 +646,12 @@ public class Administrator {
     public void deleteItem(String item_ID){
         //todo only if its not available in machines (quantity == 0)
         try {
-            pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item_ID);
+            pstmt = Conn.prepareStatement("DELETE FROM Delivery_Invoice WHERE Item_ID= ?");
+            pstmt.setInt(1, Integer.parseInt(item_ID));
             ResultSet rset = pstmt.executeQuery();
-            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID= " + item_ID);
-            ResultSet rset1 = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Item_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(item_ID));
+            rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -663,7 +667,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(technician_ID.toString()));
         ResultSet rset = pstmt.executeQuery();
 
-        while (rset != null){
+        while (rset.next()){
             System.out.println("ID already exists, please enter another number: ");
             technician_ID = new Scanner(System.in);}
 
@@ -685,7 +689,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(technician_WID.toString()));
         rset = pstmt.executeQuery();
 
-        while (rset == null){
+        while (!rset.next()){
             System.out.println("Warehouse does not exist");
             technician_WID = new Scanner(System.in);}
 
@@ -705,10 +709,12 @@ public class Administrator {
     public void deleteTechnician(String technician_ID){
         try {
             pstmt = Conn.prepareStatement("UPDATE Task SET Task_Status  = "
-                    + "'To be assigned' WHERE Task_ID = " + technician_ID);
-            ResultSet rset1 = pstmt.executeQuery();
-            pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= " + technician_ID);
+                    + "'To be assigned' WHERE Task_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(technician_ID));
             ResultSet rset = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("DELETE FROM Technician WHERE Technician_ID= ?" );
+            pstmt.setInt(1, Integer.parseInt(technician_ID));
+            rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -724,7 +730,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(supplier_ID.toString()));
         ResultSet rset = pstmt.executeQuery();
 
-        while (rset != null){
+        while (rset.next()){
             System.out.println("ID already exists, please enter another number: ");
             supplier_ID = new Scanner(System.in);}
 
@@ -744,10 +750,12 @@ public class Administrator {
 
     public void deleteSupplier(String supplier_ID){
         try {
-            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Supplier_ID= " + supplier_ID);
+            pstmt = Conn.prepareStatement("DELETE FROM Item WHERE Supplier_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(supplier_ID));
             ResultSet rset = pstmt.executeQuery();
-            pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID= " + supplier_ID);
-            ResultSet rset1 = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(supplier_ID));
+            rset = pstmt.executeQuery();
             //todo maybe create separate function to delete items bc it will be used above
         } catch (SQLException e) {
             e.printStackTrace();
@@ -764,7 +772,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(job_ID.toString()));
         ResultSet rset = pstmt.executeQuery();
 
-        while (rset != null){
+        while (rset.next()){
             System.out.println("ID already exists, please enter another number: ");
             job_ID = new Scanner(System.in);}
 
@@ -789,7 +797,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(job_TID.toString()));
         rset = pstmt.executeQuery();
 
-        while (rset == null){
+        while (!rset.next()){
             System.out.println("Technician does not exist");
             job_TID = new Scanner(System.in);
         }
@@ -797,8 +805,7 @@ public class Administrator {
         String date=java.time.LocalDate.now().toString();
         //todo check format
         try {
-            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +job_ID+", "+ date + job_type+", "
-                    +job_deadline+", "+"'To be assigned'"+", "+job_TID+", "+")");
+            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(?, ?, ?, ?, ?, ?)");
             pstmt.setInt(1, Integer.parseInt(job_ID.toString()));
             pstmt.setString(2, date);
             pstmt.setInt(3, Integer.parseInt(job_type.toString()));
@@ -815,8 +822,10 @@ public class Administrator {
     public void deleteJob(String job_ID){
         try {
             pstmt = Conn.prepareStatement("UPDATE Task SET Task_Status  = "
-                    + "'Canceled' WHERE Task_ID = " + job_ID);
-            ResultSet rset = pstmt.executeQuery();
+                    + "'Canceled' WHERE Task_ID = ?");
+            pstmt.setInt(1, Integer.parseInt(job_ID));
+            pstmt.executeUpdate();
+            //todo check it
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
