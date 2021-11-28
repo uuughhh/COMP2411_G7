@@ -1,14 +1,8 @@
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.sql.Date;
 import java.util.*;
-import java.io.*;
-import java.io.Console;
 import java.sql.*;
 
 import oracle.jdbc.OracleConnection;
-import oracle.jdbc.driver.*;
-import oracle.sql.*;
+
 public class Administrator {
 
     private PreparedStatement pstmt;
@@ -253,8 +247,7 @@ public class Administrator {
 
                     case 4 -> {
                         this.checkVMachine();
-                        System.out.print("If you want to check purchase records on a certain machine, please enter its ID number, " +
-                                "else enter a date to check all purchases on a certain day");
+                        System.out.print("If you want to check purchase records on a certain machine, please enter its ID number");
                         Scanner purchase = new Scanner(System.in);
                         this.checkPurchase(purchase.toString());
                     }
@@ -311,7 +304,7 @@ public class Administrator {
 
     public void checkVMachine ()  {
         try {
-            pstmt = Conn.prepareStatement("SELECT * FROM Vending_Machine");
+            pstmt = Conn.prepareStatement("SELECT * FROM Vending_Machine ");
             ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
@@ -336,8 +329,7 @@ public class Administrator {
             if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID.");
             while (rset.next())
             {
-                System.out.println(rset.getString(1)
-                        + " " + rset.getString(2)
+                System.out.println(rset.getString(2)
                         + " " + rset.getString(3)
                         + " " + rset.getString(4)
                         + " " + rset.getString(5));
@@ -350,7 +342,12 @@ public class Administrator {
 
     public void checkMStock(String machineNum)  {
         try {
-            pstmt = Conn.prepareStatement("SELECT Item_ID, Quantity FROM Vending_Machine_Stock WHERE Machine_ID = ?");
+            pstmt = Conn.prepareStatement("SELECT Delivery_Invoice.Item_ID, Vending_Machine_Stock.Quantity " +
+                    "FROM(Vending_Machine_Stock INNER JOIN " +
+                    "(Delivery_Invoice INNER JOIN " +
+                    "(SELECT Refill_Invoice.Delivery_ID,Refill_Invoice.Refill_ID FROM Refill_Invoice WHERE Machine_ID = ?) " +
+                    "ON Delivery_Invoice.Delivery_ID = Refill_Invoice.Delivery_ID) " +
+                    "ON Vending_Machine_Stock.Refill_ID = Refill_Invoice.Refill_ID)");
             pstmt.setInt(1,Integer.parseInt(machineNum));
             ResultSet rset = pstmt.executeQuery();
             if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID or empty stock.");
@@ -369,8 +366,9 @@ public class Administrator {
 
     public void checkMachineRefill (String machineNum)  {
         try {
-            pstmt = Conn.prepareStatement("SELECT Refill_ID, Warehouse_ID, Item_ID, Quantity, Refill_Date, Technician_ID" +
-                    "FROM Refill_Invoice" + "WHERE Machine_ID = ?");
+            pstmt = Conn.prepareStatement("SELECT Refill_Invoice.Refill_ID, Delivery_Invoice.Item_ID, Refill_Invoice.Quantity,Refill_Invoice.Refill_Date, Refill_Invoice.Technician_ID " +
+                    "FROM Refill_Invoice, Delivery_Invoice " +
+                    "WHERE Refill_Invoice.Machine_ID = ? AND Refill_Invoice.Delivery_ID = Delivery_Invoice.Delivery_ID "  );
             pstmt.setInt(1,Integer.parseInt(machineNum));
             ResultSet rset = pstmt.executeQuery();
             if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID or empty refill invoice.");
@@ -380,8 +378,7 @@ public class Administrator {
                         + " " + rset.getString(2)
                         + " " + rset.getString(3)
                         + " " + rset.getString(4)
-                        + " " + rset.getString(5)
-                        + " " + rset.getString(6));
+                        + " " + rset.getString(5));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -390,40 +387,24 @@ public class Administrator {
     }
 
 
-    public boolean isDate (String idORdate){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        try {
-            dateFormat.parse(idORdate.trim());
-        } catch (ParseException pe) {
-            return false;
-        }
-        return true;
-    }
 
-    public void checkPurchase (String idORdate){
+    public void checkPurchase (String machineNum){
         try {
-            ResultSet rset;
-            if (isDate(idORdate)){
-                pstmt = Conn.prepareStatement("SELECT Purchase_ID, Item_ID, Vending_Machine_ID FROM Purchase_Invoice"+
-                        "WHERE Purchase_Date = ?");
-                pstmt.setDate(1, Date.valueOf(idORdate));
-                rset = pstmt.executeQuery();
-            } else {
-                pstmt = Conn.prepareStatement("SELECT Purchase_ID, Item_ID, Purchase_Date FROM Purchase_Invoice"+
-                        "WHERE Vending_Machine_ID = ?");
-                pstmt.setInt(1, Integer.parseInt(idORdate));
-                rset = pstmt.executeQuery();
-            }
+            pstmt = Conn.prepareStatement("SELECT Purchase_Invoice.Purchase_ID, Delivery_Invoice.Item_ID, Purchase_Invoice.Purchase_Date " +
+                    "FROM(Purchase_Invoice INNER JOIN " +
+                    "(Delivery_Invoice INNER JOIN " +
+                    "(SELECT Refill_Invoice.Delivery_ID,Refill_Invoice.Refill_ID FROM Refill_Invoice WHERE Machine_ID = ?) " +
+                    "ON Delivery_Invoice.Delivery_ID = Refill_Invoice.Delivery_ID) " +
+                    "ON Purchase_Invoice.Refill_ID = Refill_Invoice.Refill_ID)");
+            pstmt.setInt(1, Integer.parseInt(machineNum));
+            ResultSet rset = pstmt.executeQuery();
+
             if (!rset.next()) throw new IllegalArgumentException("Wrong input.");
             while (rset.next())
             {
                 System.out.println(rset.getString(1)
                         + " " + rset.getString(2)
-                        + " " + rset.getString(3)
-                        + " " + rset.getString(4)
-                        + " " + rset.getString(5)
-                        + " " + rset.getString(6));
+                        + " " + rset.getString(3));
             }
 
         } catch (SQLException e) {
@@ -449,7 +430,8 @@ public class Administrator {
 
     public void checkWStock (){
         try {
-            pstmt = Conn.prepareStatement("SELECT * FROM Warehouse_Stock");
+            pstmt = Conn.prepareStatement("SELECT Delivery_Invoice.Warehouse_ID, Delivery_Invoice.Item_ID, Warehouse_Stock.Quantity " +
+                    "FROM Warehouse_Stock, Delivery_Invoice");
             ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
@@ -466,8 +448,9 @@ public class Administrator {
 
     public void checkWStock (String houseNum){
         try {
-            pstmt = Conn.prepareStatement("SELECT Item_ID, Quantity FROM Warehouse_Stock " +
-                    "WHERE Warehouse_ID = ?");
+            pstmt = Conn.prepareStatement("SELECT Delivery_Invoice.Item_ID, Warehouse_Stock.Quantity " +
+                    "FROM Warehouse_Stock, Delivery_Invoice " +
+                    "WHERE Delivery_Invoice.Warehouse_ID = ? AND Delivery_Invoice.Delivery_ID = Warehouse_Stock.Delivery_ID ");
             pstmt.setInt(1, Integer.parseInt(houseNum));
             ResultSet rset = pstmt.executeQuery();
             if (!rset.next()) throw new IllegalArgumentException("Wrong warehouse Id or empty stock.");
@@ -518,8 +501,8 @@ public class Administrator {
 
     public void checkItem (String supp){
         try {
-            pstmt = Conn.prepareStatement("SELECT Item_ID, Item_Name, Sell_Price" +
-                    " FROM Item WHERE Supplier = ?");
+            pstmt = Conn.prepareStatement("SELECT Item_ID, Item_Name, Sell_Price " +
+                    "FROM Item WHERE Supplier = ?");
             pstmt.setInt(1, Integer.parseInt(supp));
             ResultSet rset = pstmt.executeQuery();
             if (!rset.next()) throw new IllegalArgumentException("Wrong supplier id or it has no item.");
@@ -590,8 +573,9 @@ public class Administrator {
 
     public void checkTechRefill(String techID){
         try {
-            pstmt = Conn.prepareStatement("SELECT * FROM Refill_Invoice " +
-                    "WHERE Technician_ID = ?");
+            pstmt = Conn.prepareStatement("SELECT Refill_Invoice.Refill_ID, Delivery_Invoice.Item_ID, Refill_Invoice.Machine_ID, Refill_Invoice.Quantity, Refill_Invoice.Refill_Date " +
+                    "FROM Refill_Invoice, Delivery_Invoice " +
+                    "WHERE Refill_Invoice.Technician_ID = ? AND Refill_Invoice.Delivery_ID = Delivery_Invoice.Delivery_ID");
             pstmt.setInt(1, Integer.parseInt(techID));
             ResultSet rset = pstmt.executeQuery();
             if (!rset.next()) throw new IllegalArgumentException
