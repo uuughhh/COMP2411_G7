@@ -514,16 +514,14 @@ public class Administrator {
 
     public void createMachine() throws SQLException {
         System.out.println("Please enter new machine's id: ");
-
-        pstmt = Conn.prepareStatement("SELECT * Vending_Machine " +
-                "WHERE Vending_Machine_ID = ?");
         Scanner machine_ID = new Scanner(System.in);
-        pstmt.setInt(1, Integer.parseInt(machine_ID.toString()));
 
-        //until here
-        pstmt = Conn.prepareStatement("SELECT Vending_Machine_ID WHERE Vending_Machine_ID = " + machine_ID + "FROM Vending_Machine");
-        // check whether it already exists
-        while (pstmt != null){
+        pstmt = Conn.prepareStatement("SELECT * FROM Vending_Machine " +
+                "WHERE Vending_Machine_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(machine_ID.toString()));
+        ResultSet rset = pstmt.executeQuery();
+
+        while (rset != null){
             System.out.println("ID already exists, please enter another number: ");
             machine_ID = new Scanner(System.in);}
 
@@ -532,25 +530,47 @@ public class Administrator {
         System.out.println("Please enter new machine's number of slots: ");
         Scanner machine_NumOfS = new Scanner(System.in);
 
-        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM  Warehouse");
-        ResultSet rset = pstmt.executeQuery();
-        System.out.println(rset.getString(1));
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse");
+        rset = pstmt.executeQuery();
+
+        while (rset.next()) {
+            System.out.println(rset.getString(1));
+        }
         // just id numbers of warehouses
         System.out.println("Please select on of the new machine's warehouse ids above: ");
-        //todo input validation
-
         Scanner machine_WID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse " +
+                "WHERE Warehouse_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(machine_WID.toString()));
+        rset = pstmt.executeQuery();
+
+        while (rset == null){
+            System.out.println("Warehouse does not exist");
+            machine_WID = new Scanner(System.in);}
+
         System.out.println("In Service \n" +
                 "Out of Order \n" +
                 "In Repair \n" +
                 "Empty \n" +
                 "Please select new machine's status from the above: ");
-        //todo input validation
         Scanner machine_status = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Status FROM Vending_Machine " +
+                "WHERE Status = ?");
+        pstmt.setString(1, machine_status.toString());
+        rset = pstmt.executeQuery();
+
+        while (rset == null){
+            System.out.println("Wrong format of status. Please try again:");
+            machine_ID = new Scanner(System.in);}
+
         try {
-            pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
-                    machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
-            rset = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(?,?,?,?,?)");
+            pstmt.setInt(1, Integer.parseInt(machine_ID.toString()));
+            pstmt.setString(2, machine_adress.toString());
+            pstmt.setInt(3, Integer.parseInt(machine_NumOfS.toString()));
+            pstmt.setInt(4, Integer.parseInt(machine_WID.toString()));
+            pstmt.setString(5, machine_status.toString());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");

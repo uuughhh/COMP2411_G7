@@ -51,15 +51,5 @@ public class Clients
 		System.out.println("The execution of the application has ended.");
 
 
-		/*Statement stmt = conn.createStatement();
-		ResultSet rset = stmt.executeQuery("SELECT EMPNO, ENAME, JOB FROM EMP");
-		while (rset.next())
-		{
-			System.out.println(rset.getInt(1) 
-			+ " " + rset.getString(2) 
-			+ " " + rset.getString(3));
-		}
-		System.out.println();
-		conn.close();*/
 	}
 }
