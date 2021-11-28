@@ -15,7 +15,7 @@ public class Administrator {
         boolean run = true;
         while (run) {
             System.out.print("1 -->> Get information about the vending machine system \n" +
-                    "2 -->> Updates information of the vending machine system\n"+
+                    "2 -->> Update information of the vending machine system\n"+
                     "-1 -->> Exit\n" +
                     "Please choose an option to execute:");
             Scanner operation_0 = new Scanner(System.in);
@@ -35,7 +35,108 @@ public class Administrator {
 
 
 
-    public void updates (){}
+    public void updates (){
+        System.out.print("1 -->> Change information about vending machines \n" +
+                "2 -->> Change Available Items\n" +
+                "3 -->> Change Jobs\n" +
+                "4 -->> Change Technicians\n" +
+                "5 -->> Change Suppliers\n" +
+                "Please choose an option to execute:");
+        Scanner operation = new Scanner(System.in);
+        int num;
+        if (operation.hasNextLine()) {
+            num = Integer.parseInt(operation.nextLine());
+            try {
+                switch (num) {
+                    case 1 -> {
+                        System.out.print("If you want to remove a certain machine, please enter its ID number, " +
+                                "else enter 1 to add new machine");
+                        Scanner machine = new Scanner(System.in);
+                        if (machine.nextLine().equals("1")) {
+
+                        }
+                        else this.checkVMachine(machine.nextLine());
+                        //should i add continue updates of vending machines or end
+                    }
+
+                    case 2 -> {
+                        System.out.print("If you want to remove existing item, please enter its ID number, " +
+                                "else enter 1 to add new item");
+                        Scanner item = new Scanner(System.in);
+                        if (item.nextLine().equals("1")) {
+                            System.out.println("Please enter new item's id: ");
+                            //check whether it already exists
+                            Scanner item_ID = new Scanner(System.in);
+                            System.out.println("Please enter new item's name: ");
+                            Scanner item_name = new Scanner(System.in);
+                            System.out.println("Please enter new item's supplier id: ");
+                            Scanner item_SID = new Scanner(System.in);
+                            System.out.println("Please enter new item's price: ");
+                            Scanner item_pr = new Scanner(System.in);
+                            try {
+                                ResultSet rset = stmt.executeQuery("INSERT INTO TECHNICIAN VALUES(" +item_ID+", "+ item_name+ ", "+item_SID+ ", "+ item_pr+")");
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
+                        }
+                        else {
+                            //only if its not available in machines (quantity == 0)
+                            try {
+                            ResultSet rset = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.out.println("Something is wrong with SQL.");
+                        }
+                        }
+                    }
+
+                    case 3 -> {
+                        Scanner job = new Scanner(System.in);
+                        //add job
+                    }
+
+                    case 4 -> {
+                        System.out.print("If you want to remove technician, please enter their ID number, " +
+                                "else enter 1 to add new technician");
+                        Scanner technician = new Scanner(System.in);
+                        if (technician.nextLine().equals("1")) {
+                            System.out.println("Please enter new technician's id: ");
+                            //check whether it already exists
+                            Scanner technician_ID = new Scanner(System.in);
+                            System.out.println("Please enter new technician's name: ");
+                            Scanner technician_name = new Scanner(System.in);
+                            System.out.println("Please enter new technician's warehouse id: ");
+                            Scanner technician_WID = new Scanner(System.in);
+                            try {
+                                ResultSet rset = stmt.executeQuery("INSERT INTO Item VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
+                        }
+                        else {
+                            try {
+                                ResultSet rset = stmt.executeQuery("DELETE FROM Technician WHERE Technician_ID= " + technician);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
+                        }
+                    }
+
+                    case 5 -> {
+                        System.out.print("If you want to remove supplier, please enter their ID number, " +
+                                "else enter 1 to add new supplier");
+                        Scanner supplier = new Scanner(System.in);
+                        //maybe remove bc too many things need to be changed
+                    }
+
+                    default -> throw new IllegalArgumentException("Please enter a legit number.");
+                }
+            } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
+        }
+    }
 
     public void queries () {
         System.out.print("1 -->> Check out vending machines \n" +
