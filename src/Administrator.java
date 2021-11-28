@@ -18,22 +18,26 @@ public class Administrator {
         this.Conn = Conn;
         boolean run = true;
         while (run) {
-            System.out.print("1 -->> Get information about the vending machine system \n" +
-                    "2 -->> Update information of the vending machine system\n"+
-                    "-1 -->> Exit\n" +
-                    "Please choose an option to execute:");
-            Scanner operation_0 = new Scanner(System.in);
-            int operationNum_0;
-            if (operation_0.hasNextLine()) {
-                operationNum_0 = Integer.parseInt(operation_0.nextLine());
-                switch (operationNum_0){
-                    case 1 -> this.queries();
+            try {
+                System.out.print("1 -->> Get information about the vending machine system \n" +
+                        "2 -->> Update information of the vending machine system\n" +
+                        "-1 -->> Exit\n" +
+                        "Please choose an option to execute:");
+                Scanner operation_0 = new Scanner(System.in);
+                int operationNum_0;
+                if (operation_0.hasNextLine()) {
+                    operationNum_0 = Integer.parseInt(operation_0.nextLine());
+                    switch (operationNum_0) {
+                        case 1 -> this.queries();
 
-                    case 2 -> this.updates();
+                        case 2 -> this.updates();
 
-                    case -1 -> run = false;
+                        case -1 -> run = false;
+
+                        default -> throw new IllegalArgumentException("Please enter a legit number.");
+                    }
                 }
-            }
+            } catch (IllegalArgumentException e) {System.out.println(e.getMessage());}
         }
     }
 
