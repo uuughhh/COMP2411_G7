@@ -515,7 +515,11 @@ public class Administrator {
     public void createMachine() throws SQLException {
         System.out.println("Please enter new machine's id: ");
 
+        pstmt = Conn.prepareStatement("SELECT * Vending_Machine " +
+                "WHERE Vending_Machine_ID = ?");
         Scanner machine_ID = new Scanner(System.in);
+        pstmt.setInt(1, Integer.parseInt(machine_ID.toString()));
+
         pstmt = Conn.prepareStatement("SELECT Vending_Machine_ID WHERE Vending_Machine_ID = " + machine_ID + "FROM Vending_Machine");
         // check whether it already exists
         while (pstmt != null){
