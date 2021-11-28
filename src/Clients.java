@@ -3,6 +3,7 @@ import java.io.*;
 import java.io.Console;
 import java.sql.*;
 import oracle.jdbc.driver.*;
+import oracle.sql.*;
 
 public class Clients
 {
@@ -30,10 +31,11 @@ public class Clients
 		Scanner pos = new Scanner(System.in);
 		int posNum = 4;
 		if (pos.hasNextLine()) posNum = Integer.parseInt(pos.nextLine());
-			switch (posNum) {
-				case 1 -> {
 
-				}
+		switch (posNum){
+			case 1 -> {
+				new Customer(conn);
+			}
 
 				case 2 -> {
 					System.out.print("Please enter your Technician id:");

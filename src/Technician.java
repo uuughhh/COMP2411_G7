@@ -8,7 +8,7 @@ import oracle.jdbc.driver.*;
 import oracle.sql.*;
 
 public class Technician {
-    private String id;
+    private final String id;
 
     public Technician (String id, OracleConnection Conn) throws SQLException {
         this.id = id;
