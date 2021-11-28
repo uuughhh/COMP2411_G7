@@ -22,13 +22,24 @@ public class Administrator {
                 if (operation_0.hasNextLine()) {
                     operationNum_0 = Integer.parseInt(operation_0.nextLine());
                     switch (operationNum_0) {
-                        case 1 -> this.queries();
+                        case 1 : {
+                            this.queries();
+                            break;
+                        }
 
-                        case 2 -> this.updates();
+                        case 2 :{
+                            this.updates();
+                            break;
+                        }
 
-                        case -1 -> run = false;
+                        case -1 :{
+                            run = false;
+                            break;
+                        }
 
-                        default -> throw new IllegalArgumentException("Please enter a legit number.");
+                        default :{
+                            throw new IllegalArgumentException("Please enter a legit number.");
+                        }
                     }
                 }
             } catch (IllegalArgumentException e) {System.out.println(e.getMessage());}
@@ -50,49 +61,57 @@ public class Administrator {
             num = Integer.parseInt(operation.nextLine());
             try {
                 switch (num) {
-                    case 1 -> {
+                    case 1 : {
                         System.out.print("If you want to remove a certain machine, please enter its ID number, " +
                                 "else enter 1 to add new machine");
                         Scanner machine = new Scanner(System.in);
                         if (machine.nextLine().equals("1")) createMachine();
                         else deleteMachine(machine.toString());
+                        break;
                     }
 
-                    case 2 -> {
+                    case 2 : {
                         System.out.print("If you want to remove existing item, please enter its ID number, " +
                                 "else enter 1 to add new item");
                         Scanner item = new Scanner(System.in);
                         if (item.nextLine().equals("1")) createItem();
 
                         else deleteItem(item.toString());
+                        break;
                     }
 
-                    case 3 -> {
+                    case 3 : {
                         Scanner job = new Scanner(System.in);
                         if (job.nextLine().equals("1")) createJob();
 
                         else deleteJob(job.toString());
+                        break;
                     }
 
-                    case 4 -> {
+                    case 4 : {
                         System.out.print("If you want to remove technician, please enter their ID number, " +
                                 "else enter 1 to add new technician");
                         Scanner technician = new Scanner(System.in);
                         if (technician.nextLine().equals("1")) createTechnician();
 
                         else deleteTechnician(technician.toString());
+                        break;
                     }
 
-                    case 5 -> {
+                    case 5 : {
                         System.out.print("If you want to remove supplier, please enter their ID number, " +
                                 "else enter 1 to add new supplier");
                         Scanner supplier = new Scanner(System.in);
                         if (supplier.nextLine().equals("1")) createSupplier();
 
                         else deleteSupplier(supplier.toString());
+                        break;
                     }
 
-                    default -> throw new IllegalArgumentException("Please enter a legit number.");
+                    default :{
+                        throw new IllegalArgumentException("Please enter a legit number.");
+                    }
+
                 }
             } catch (IllegalArgumentException | SQLException e){System.out.println(e.getMessage());}
         }
@@ -121,80 +140,96 @@ public class Administrator {
             operationNum_1 = Integer.parseInt(operation_1.nextLine());
             try {
                 switch (operationNum_1) {
-                    case 1 -> {
+                    case 1 : {
                         System.out.print("If you want to check on a certain machine, please enter its ID number, " +
                                 "else enter -1 to check all.");
                         Scanner machine = new Scanner(System.in);
                         if (machine.nextLine().equals("-1")) this.checkVMachine();
                         else this.checkVMachine(machine.nextLine());
+                        break;
                     }
 
-                    case 2 -> {
+                    case 2 : {
                         this.checkVMachine();
                         System.out.print("Enter a machine id to check its stock.");
                         Scanner stock = new Scanner(System.in);
                         this.checkMStock(stock.nextLine());
+                        break;
                     }
 
-                    case 3 -> {
+                    case 3 : {
                         this.checkVMachine();
                         System.out.print("Enter a machine id to check its refill status.");
                         Scanner refill = new Scanner(System.in);
                         this.checkMachineRefill(refill.nextLine());
+                        break;
                     }
 
-                    case 4 -> {
+                    case 4 : {
                         this.checkVMachine();
                         System.out.print("If you want to check purchase records on a certain machine, please enter its ID number");
                         Scanner purchase = new Scanner(System.in);
                         this.checkPurchase(purchase.toString());
+                        break;
                     }
 
-                    case 5 -> {
+                    case 5 : {
                         this.checkWhouse();
                         System.out.print("If you want to check on the stock of a certain warehouse, please enter its ID number, " +
                                 "else enter -1 to check all.");
                         Scanner warehouse = new Scanner(System.in);
                         if (warehouse.toString().equals("-1")) this.checkWStock();
                         else this.checkWStock(warehouse.toString());
+                        break;
                     }
 
-                    case 6 -> this.checkSupp();
+                    case 6 :
+                    {this.checkSupp();
+                    break;}
 
-                    case 7 ->{
+                    case 7 :{
                         this.checkSupp();
                         System.out.print("If you want to check on the items provide a certain supplier, please enter its ID number, " +
                                 "else enter -1 to check all.");
                         Scanner supp = new Scanner(System.in);
                         if (supp.toString().equals("-1")) this.checkItem();
                         else this.checkItem(supp.toString());
+                        break;
                     }
 
-                    case 8 ->this.checkTechnician();
+                    case 8 : {
+                        this.checkTechnician();
+                        break;
+                    }
 
-                    case 9 ->{
+                    case 9 : {
                         this.checkTechnician();
                         System.out.print("If you want to check out tasks of a certain technician, please enter the ID number, " +
                                 "else enter -1 to check all.");
                         Scanner task = new Scanner(System.in);
                         if (task.nextLine().equals("-1")) this.checkTasks();
                         else this.checkTasks(task.nextLine());
+                        break;
                     }
 
-                    case 10 ->{
+                    case 10 :{
                         this.checkTechnician();
                         System.out.print("Please enter a technician ID to check corresponding refill invoice");
                         Scanner techID = new Scanner(System.in);
                         this.checkTechRefill(techID.toString());
+                        break;
                     }
 
-                    case 11 ->{
+                    case 11 :{
                         System.out.print("Please enter a legit sql query.");
                         Scanner query = new Scanner(System.in);
                         this.otherQuery(query.toString());
+                        break;
                     }
 
-                    default -> throw new IllegalArgumentException("Please enter a legit number.");
+                    default : {
+                        throw new IllegalArgumentException("Please enter a legit number.");
+                    }
                 }
             } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
         }

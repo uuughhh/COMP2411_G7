@@ -25,21 +25,28 @@ public class Customer {
                 try{
                     switch (operationNum) {
 
-                        case 1 -> {
+                        case 1 : {
                             System.out.print("Enter the name of the item that you would like to buy: ");
                             Scanner item = new Scanner(System.in);
                             this.getMachine(item.nextLine());
+                            break;
                         }
 
-                        case 2 -> {
+                        case 2 : {
                             System.out.print("Enter the address of the machine that you would like to check: ");
                             Scanner machine = new Scanner(System.in);
                             this.getItems(machine.nextLine());
                             System.out.print("The task has been set as finished.");
+                            break;
                         }
 
-                        case -1 -> run = false;
-                        default -> throw new IllegalArgumentException("Please enter a legit number.");
+                        case -1 : {
+                            run = false;
+                            break;
+                        }
+                        default :{
+                            throw new IllegalArgumentException("Please enter a legit number.");
+                        }
                     }
                 } catch (IllegalArgumentException e){System.out.println(e.getMessage());}
             }
