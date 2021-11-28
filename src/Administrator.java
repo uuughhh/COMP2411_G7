@@ -525,6 +525,7 @@ public class Administrator {
             System.out.println("ID already exists, please enter another number: ");
             machine_ID = new Scanner(System.in);}
 
+
         System.out.println("Please enter new machine's address: ");
         Scanner machine_adress = new Scanner(System.in);
         System.out.println("Please enter new machine's number of slots: ");
@@ -724,21 +725,25 @@ public class Administrator {
 
     public void createSupplier() throws SQLException {
         System.out.println("Please enter new Supplier's id: ");
-
         Scanner supplier_ID = new Scanner(System.in);
-        pstmt = Conn.prepareStatement("SELECT Supplier_ID WHERE Supplier_ID = " + supplier_ID + "FROM Supplier");
-        // check whether it already exists
-        while (pstmt != null){
-            System.out.println("ID already exists, please enter another number: ");
-            supplier_ID = new Scanner(System.in);
-        }
 
+        pstmt = Conn.prepareStatement("SELECT * FROM Supplier " +
+                "WHERE Supplier_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(supplier_ID.toString()));
+        ResultSet rset = pstmt.executeQuery();
+
+        while (rset != null){
+            System.out.println("ID already exists, please enter another number: ");
+            supplier_ID = new Scanner(System.in);}
 
         System.out.println("Please enter new Supplier's name: ");
         Scanner supplier_name = new Scanner(System.in);
+
         try {
-            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +supplier_ID+", "+ supplier_name+")");
-            ResultSet rset = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(?, ?)");
+            pstmt.setInt(1, Integer.parseInt(supplier_ID.toString()));
+            pstmt.setString(2, supplier_name.toString());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
