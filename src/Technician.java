@@ -1,22 +1,21 @@
 import java.util.*;
-import java.io.*;
-import java.io.Console;
 import java.sql.*;
+import java.sql.PreparedStatement;
 
 import oracle.jdbc.OracleConnection;
-import oracle.jdbc.driver.*;
-import oracle.sql.*;
 
 public class Technician {
     private final String id;
+    private OracleConnection Conn;
+    private PreparedStatement pstmt;
 
     public Technician (String id, OracleConnection Conn) throws SQLException {
         this.id = id;
-        Statement stmt = Conn.createStatement();
+        this.Conn = Conn;
         boolean run = true;
         while (run) {
         System.out.print("1 -->> Get your refill invoice \n" +
-                "2 -->> Get a list of job to be done  \n" +
+                "2 -->> Get a list of task to be done  \n" +
                 "3 -->> Get the location of your warehouse  \n" +
                 "-1 -->> Exit\n" +
                 "Please select the type of query you like to make:\n");
@@ -27,19 +26,19 @@ public class Technician {
                 try{
                     switch (operationNum) {
 
-                        case 1 -> {this.getRefillInvoice(stmt);}
+                        case 1 -> {this.getRefillInvoice();}
 
                         case 2 -> {
-                            this.getJobs(stmt);
+                            this.getTasks();
 
-                            System.out.print("Enter the Job id number if you want to set a job as done. Enter -1 to exit.");
+                            System.out.print("Enter the task id number if you want to set a job as done. Enter -1 to exit.");
                             Scanner job = new Scanner(System.in);
-                            this.setJobDone(job.nextLine(), stmt);
-                            System.out.print("The job has been set as finished.");
+                            this.setJobDone(job.nextLine());
+                            System.out.print("The task has been set as finished.");
                         }
 
                         case 3 -> {
-                            this.getLocation(stmt);
+                            this.getLocation();
                         }
 
                         case -1 -> run = false;
@@ -50,12 +49,19 @@ public class Technician {
         }
     }
 
-    public void getRefillInvoice (Statement statement) {
+    public void getRefillInvoice() {
         try {
-            ResultSet rset = statement.executeQuery("SELECT * FROM RefillInvoices WHERE Technician_id = "+ id);
+            pstmt = Conn.prepareStatement("SELECT * FROM Refill_Invoice WHERE Technician_ID = ?");
+            pstmt.setInt(1,Integer.parseInt(id));
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
-
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5)
+                        + " " + rset.getString(6));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,12 +69,18 @@ public class Technician {
 
     }
 
-    public void getJobs (Statement statement)  {
+    public void getTasks()  {
         try {
-            ResultSet rset = statement.executeQuery("SELECT * FROM Job WHERE TECHNICIANID ="+id);
+            pstmt = Conn.prepareStatement("SELECT * FROM Task WHERE Technician_ID = ? AND Status = ?");
+            pstmt.setInt(1,Integer.parseInt(id));
+            pstmt.setString(2,"In Progress");
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
-
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -78,25 +90,28 @@ public class Technician {
 
 
 
-    public void setJobDone (String jobID,Statement statement) {
+    public void setJobDone(String jobID) {
         try {
-            int rowNum0 = statement.executeUpdate("UPDATE Job SET Status = ??? WHERE Job_id = " + jobID);
+            pstmt = Conn.prepareStatement("UPDATE Job SET Status = ? WHERE Job_id = ?");
+            pstmt.setString(1,"Completed");
+            pstmt.setInt(2,Integer.parseInt(jobID));
+            int rowNum0 = pstmt.executeUpdate();
             if (rowNum0 == 0) throw new IllegalArgumentException("Wrong job ID.");
-            //need to add to refill invoice too
-            int rowNum1 = statement.executeUpdate("");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
     }
 
-    public void getLocation (Statement statement)  {
+    public void getLocation()  {
         try {
-            ResultSet rset = statement.executeQuery("SELECT Location FROM Warehouse WHERE Job_id = "+
-                    id + "AND Status = ???");
+            pstmt = Conn.prepareStatement("SELECT Adress FROM Warehouse WHERE Warehouse.Warehouse_ID =" +
+                    "(SELECT Warehouse_ID FROM Technician WHERE Technician_ID = ?");
+            pstmt.setInt(1,Integer.parseInt(id));
+            ResultSet rset = pstmt.executeQuery();
             while (rset.next())
             {
-
+                System.out.println(rset.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();

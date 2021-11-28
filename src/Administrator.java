@@ -2,16 +2,18 @@ import java.util.*;
 import java.io.*;
 import java.io.Console;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import oracle.jdbc.OracleConnection;
-import oracle.jdbc.driver.*;
 import oracle.sql.*;
 public class Administrator {
 
-    public Statement stmt;
+    private PreparedStatement pstmt;
+    private OracleConnection Conn;
 
     public Administrator(OracleConnection Conn) throws SQLException {
-        stmt = Conn.createStatement();
+        this.Conn = Conn;
         boolean run = true;
         while (run) {
             System.out.print("1 -->> Get information about the vending machine system \n" +
@@ -83,12 +85,12 @@ public class Administrator {
                         else {
                             //todo only if its not available in machines (quantity == 0)
                             try {
-                            ResultSet rset = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
-                            //todo what to do with delivery invoice
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            System.out.println("Something is wrong with SQL.");
-                        }
+                                ResultSet rset = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
+                                //todo what to do with delivery invoice
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
                         }
                     }
 
@@ -163,11 +165,21 @@ public class Administrator {
     }
 
     public void queries () {
-        System.out.print("1 -->> Check out vending machines \n" +
-                "2 -->> Check out Purchase information \n"+
-                "3 -->> Check out warehouses\n" +
-                "4 -->> Check out Jobs\n" +
-                "5 -->> Check out Technicians\n" +
+        System.out.print("[About Vending Machine] \n"+
+                "   1 -->> Check out vending machines \n" +
+                "   2 -->> Check out machine stock \n" +
+                "   3 -->> Check out machine refill status \n" +
+                "   4 -->> Check out Purchase information \n"+
+                "[About Warehouse] \n"+
+                "   5 -->> Check out warehouses\n" +
+                "   6 -->> Check out suppliers\n" +
+                "   7 -->> Check out existing items \n"+
+                "[About Tasks & Technicians] \n"+
+                "   8 -->> Check out Technicians\n" +
+                "   9 -->> Check out Tasks\n" +
+                "   10 -->> Check out Technicians refill status\n" +
+                "11 -->> Enter a legit query by yourself\n" +
+
                 "Please choose an option to execute:");
         Scanner operation_1 = new Scanner(System.in);
         int operationNum_1;
@@ -177,34 +189,76 @@ public class Administrator {
                 switch (operationNum_1) {
                     case 1 -> {
                         System.out.print("If you want to check on a certain machine, please enter its ID number, " +
-                                "else enter 1 to check all.");
+                                "else enter -1 to check all.");
                         Scanner machine = new Scanner(System.in);
-                        if (machine.nextLine().equals("1")) this.checkVMachine();
+                        if (machine.nextLine().equals("-1")) this.checkVMachine();
                         else this.checkVMachine(machine.nextLine());
                     }
 
                     case 2 -> {
-                        System.out.print("If you want to check purchase records on a certain machine, " +
-                                "please enter its ID number, else enter 1 to check all.");
-                        Scanner purchase = new Scanner(System.in);
-                        if (purchase.nextLine().equals("1")) this.checkPurchase();
-                        else this.checkPurchase(purchase.nextLine());
+                        this.checkVMachine();
+                        System.out.print("Enter a machine id to check its stock.");
+                        Scanner stock = new Scanner(System.in);
+                        this.checkMStock(stock.nextLine());
                     }
 
                     case 3 -> {
-                        System.out.print("If you want to check on a certain warehouse, please enter its ID number, " +
-                                "else enter 1 to check all.");
-                        Scanner warehouse = new Scanner(System.in);
-                        if (warehouse.nextLine().equals("1")) this.checkWhouse();
-                        else this.checkWhouse(warehouse.nextLine());
+                        this.checkVMachine();
+                        System.out.print("Enter a machine id to check its refill status.");
+                        Scanner refill = new Scanner(System.in);
+                        this.checkMachineRefill(refill.nextLine());
                     }
 
                     case 4 -> {
-                        this.checkJobs();
+                        this.checkVMachine();
+                        System.out.print("If you want to check purchase records on a certain machine, please enter its ID number, " +
+                                "else enter a date to check all purchases on a certain day");
+                        Scanner purchase = new Scanner(System.in);
+                        this.checkPurchase(purchase.toString());
                     }
 
                     case 5 -> {
+                        this.checkWhouse();
+                        System.out.print("If you want to check on the stock of a certain warehouse, please enter its ID number, " +
+                                "else enter -1 to check all.");
+                        Scanner warehouse = new Scanner(System.in);
+                        if (warehouse.toString().equals("-1")) this.checkWStock();
+                        else this.checkWStock(warehouse.toString());
+                    }
+
+                    case 6 -> this.checkSupp();
+
+                    case 7 ->{
+                        this.checkSupp();
+                        System.out.print("If you want to check on the items provide a certain supplier, please enter its ID number, " +
+                                "else enter -1 to check all.");
+                        Scanner supp = new Scanner(System.in);
+                        if (supp.toString().equals("-1")) this.checkItem();
+                        else this.checkItem(supp.toString());
+                    }
+
+                    case 8 ->this.checkTechnician();
+
+                    case 9 ->{
                         this.checkTechnician();
+                        System.out.print("If you want to check out tasks of a certain technician, please enter the ID number, " +
+                                "else enter -1 to check all.");
+                        Scanner task = new Scanner(System.in);
+                        if (task.nextLine().equals("-1")) this.checkTasks();
+                        else this.checkTasks(task.nextLine());
+                    }
+
+                    case 10 ->{
+                        this.checkTechnician();
+                        System.out.print("Please enter a technician ID to check corresponding refill invoice");
+                        Scanner techID = new Scanner(System.in);
+                        this.checkTechRefill(techID.toString());
+                    }
+
+                    case 11 ->{
+                        System.out.print("Please enter a legit sql query.");
+                        Scanner query = new Scanner(System.in);
+                        this.otherQuery(query.toString());
                     }
 
                     default -> throw new IllegalArgumentException("Please enter a legit number.");
@@ -215,7 +269,16 @@ public class Administrator {
 
     public void checkVMachine ()  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM" );
+            pstmt = Conn.prepareStatement("SELECT * FROM Vending_Machine");
+            ResultSet rset = pstmt.executeQuery();
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -225,28 +288,94 @@ public class Administrator {
 
     public void checkVMachine (String machineNum)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            pstmt = Conn.prepareStatement("SELECT * FROM Vending_Machine WHERE Vending_Machine_ID = ?");
+            pstmt.setInt(1,Integer.parseInt(machineNum));
+            ResultSet rset = pstmt.executeQuery();
+            if (!rset.next()) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
-
-
     }
 
-    public void checkPurchase (){
+    public void checkMStock(String machineNum)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Quantity FROM Vending_Machine_Stock"
+            + "WHERE Machine_ID = "+ machineNum);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
-
     }
 
-    public void checkPurchase (String machineNum){
+    public void checkMachineRefill (String machineNum)  {
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT Refill_ID, Warehouse_ID, Item_ID, Quantity, Refill_Date, Technician_ID" +
+                    "FROM Refill_Invoice" + "WHERE Machine_ID = "+ machineNum);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5)
+                        + " " + rset.getString(6));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+
+    public boolean isDate (String idORdate){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        try {
+            dateFormat.parse(idORdate.trim());
+        } catch (ParseException pe) {
+            return false;
+        }
+        return true;
+    }
+
+    public void checkPurchase (String idORdate){
+        try {
+            ResultSet rset;
+            if (isDate(idORdate)){
+                DATE date = new DATE(idORdate);
+                rset = stmt.executeQuery("SELECT Purchase_ID, Item_ID, Vending_Machine_ID FROM Purchase_Invoice"+
+                        "WHERE Purchase_Date = "+ date);
+            } else {
+                rset = stmt.executeQuery("SELECT Purchase_ID, Item_ID, Purchase_Date FROM Purchase_Invoice"+
+                    "WHERE Vending_Machine_ID = "+ idORdate);
+            }
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong input.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5)
+                        + " " + rset.getString(6));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -254,38 +383,103 @@ public class Administrator {
     }
 
     public void checkWhouse (){
-        //join warehouse table and warehouse stock table
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Warehouse");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
     }
 
-    public void checkWhouse (String machineNum){
-        //join warehouse table and warehouse stock table
+    public void checkWStock (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Warehouse_Stock ");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+
+    }
+
+    public void checkWStock (String houseNum){
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Quantity FROM Warehouse_Stock " +
+                    "WHERE Warehouse_ID = "+houseNum);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
     }
 
-    public void checkJobs (){
+    public void checkSupp (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Supplier");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
 
+    }
+
+    public void checkItem (){
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Item");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+
+    }
+
+    public void checkItem (String supp){
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT Item_ID, Item_Name, Sell_Price" +
+                    " FROM Item WHERE Supplier = "+supp);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
     }
 
     public void checkTechnician (){
         try {
-            ResultSet rset = stmt.executeQuery("SELECT * FROM ");
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Technician");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
@@ -293,6 +487,80 @@ public class Administrator {
 
     }
 
+    public void checkTasks(String techID)  {
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Task " +
+                    "WHERE Technician_Assigned_ID ="+techID);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("Wrong machine ID.");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    public void checkTasks(){
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Task");
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5)
+                        + " " + rset.getString(6));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+
+    }
+
+    public void checkTechRefill(String techID){
+        try {
+            ResultSet rset = stmt.executeQuery("SELECT * FROM Refill_Invoice " +
+                    "WHERE Technician_ID ="+techID);
+            while (rset.next())
+            {
+                System.out.println(rset.getString(1)
+                        + " " + rset.getString(2)
+                        + " " + rset.getString(3)
+                        + " " + rset.getString(4)
+                        + " " + rset.getString(5)
+                        + " " + rset.getString(6));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+
+    }
+
+    public void otherQuery(String query)  {
+        try {
+            ResultSet rset = stmt.executeQuery(query);
+            if (rset.toString().equals("")) throw new IllegalArgumentException("NO results.");
+            int columnNum = rset.getMetaData().getColumnCount();
+            while (rset.next())
+            {
+                for (int i=1; i<columnNum+1; i++){
+                    System.out.print(rset.getString(i)+ " ");
+                }
+                System.out.print("\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
