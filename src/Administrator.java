@@ -521,7 +521,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(machine_ID.toString()));
         ResultSet rset = pstmt.executeQuery();
 
-        while (rset != null){
+        while (rset.next()){
             System.out.println("ID already exists, please enter another number: ");
             machine_ID = new Scanner(System.in);}
 
@@ -545,7 +545,7 @@ public class Administrator {
         pstmt.setInt(1, Integer.parseInt(machine_WID.toString()));
         rset = pstmt.executeQuery();
 
-        while (rset == null){
+        while (!rset.next()){
             System.out.println("Warehouse does not exist");
             machine_WID = new Scanner(System.in);}
 
@@ -560,7 +560,7 @@ public class Administrator {
         pstmt.setString(1, machine_status.toString());
         rset = pstmt.executeQuery();
 
-        while (rset == null){
+        while (!rset.next()){
             System.out.println("Wrong format of status. Please try again:");
             machine_ID = new Scanner(System.in);}
 
