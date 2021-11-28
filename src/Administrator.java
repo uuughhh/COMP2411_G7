@@ -50,11 +50,11 @@ public class Administrator {
 
     public void updates (){
         System.out.print("1 -->> Change information about vending machines \n" +
-                "   2 -->> Change Available Items\n" +
-                "   3 -->> Change Jobs\n" +
-                "   4 -->> Change Technicians\n" +
-                "   5 -->> Change Suppliers\n" +
-                "   Please choose an option to execute:");
+                "2 -->> Change Available Items\n" +
+                "3 -->> Change Jobs\n" +
+                "4 -->> Change Technicians\n" +
+                "5 -->> Change Suppliers\n" +
+                "Please choose an option to execute:");
         Scanner operation = new Scanner(System.in);
         int num;
         if (operation.hasNextLine()) {
