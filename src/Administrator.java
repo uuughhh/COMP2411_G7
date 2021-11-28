@@ -512,10 +512,16 @@ public class Administrator {
         }
     }
 
-    public void createMachine()  {
+    public void createMachine() throws SQLException {
         System.out.println("Please enter new machine's id: ");
-        //todo check whether it already exists
+
         Scanner machine_ID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Vending_Machine_ID WHERE Vending_Machine_ID = " + machine_ID + "FROM Vending_Machine");
+        // check whether it already exists
+        while (pstmt != null){
+            System.out.println("ID already exists, please enter another number: ");
+            machine_ID = new Scanner(System.in);}
+
         System.out.println("Please enter new machine's address: ");
         Scanner machine_adress = new Scanner(System.in);
         System.out.println("Please enter new machine's number of slots: ");
@@ -547,10 +553,16 @@ public class Administrator {
         }
     }
 
-    public void createItem(){
+    public void createItem() throws SQLException {
         System.out.println("Please enter new item's id: ");
-        //todo check whether it already exists
+
         Scanner item_ID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Item_ID WHERE Item_ID = " + item_ID + "FROM Item");
+        // check whether it already exists
+        while (pstmt != null){
+            System.out.println("ID already exists, please enter another number: ");
+            item_ID = new Scanner(System.in);}
+
         System.out.println("Please enter new item's name: ");
         Scanner item_name = new Scanner(System.in);
         System.out.println("Please enter new item's supplier id: ");
@@ -581,10 +593,16 @@ public class Administrator {
         }
     }
 
-    public void createTechnician(){
+    public void createTechnician() throws SQLException {
         System.out.println("Please enter new technician's id: ");
-        //todo check whether it already exists
+
         Scanner technician_ID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Technician_ID WHERE Technician_ID = " + technician_ID + "FROM Technician");
+        // check whether it already exists
+        while (pstmt != null){
+            System.out.println("ID already exists, please enter another number: ");
+            technician_ID = new Scanner(System.in);}
+
         System.out.println("Please enter new technician's name: ");
         Scanner technician_name = new Scanner(System.in);
         System.out.println("Please enter new technician's warehouse id: ");
@@ -610,10 +628,18 @@ public class Administrator {
         }
     }
 
-    public void createSupplier(){
+    public void createSupplier() throws SQLException {
         System.out.println("Please enter new Supplier's id: ");
-        //todo check whether it already exists
+
         Scanner supplier_ID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Supplier_ID WHERE Supplier_ID = " + supplier_ID + "FROM Supplier");
+        // check whether it already exists
+        while (pstmt != null){
+            System.out.println("ID already exists, please enter another number: ");
+            supplier_ID = new Scanner(System.in);
+        }
+
+
         System.out.println("Please enter new Supplier's name: ");
         Scanner supplier_name = new Scanner(System.in);
         try {
@@ -638,10 +664,17 @@ public class Administrator {
         }
     }
 
-    public void createJob(){
+    public void createJob() throws SQLException {
         System.out.println("Please enter new Job's id: ");
-        //todo check whether it already exists
+
         Scanner job_ID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Task_ID WHERE Task_ID = " + job_ID + "FROM Task");
+        // check whether it already exists
+        while (pstmt != null){
+            System.out.println("ID already exists, please enter another number: ");
+            job_ID = new Scanner(System.in);
+        }
+
         System.out.println("Please enter new Job's type: ");
         Scanner job_type = new Scanner(System.in);
         System.out.println("Please enter new Job's deadline: ");
