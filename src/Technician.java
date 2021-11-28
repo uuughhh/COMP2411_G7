@@ -39,7 +39,6 @@ public class Technician {
 
                         case 3 -> this.getLocation();
 
-
                         case -1 -> run = false;
                         default -> throw new IllegalArgumentException("Please enter a legit number.");
                     }
