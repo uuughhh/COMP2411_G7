@@ -69,7 +69,9 @@ public class Administrator {
 
                     case 3 -> {
                         Scanner job = new Scanner(System.in);
-                        //todo add job
+                        if (job.nextLine().equals("1")) createJob();
+
+                        else deleteJob(job.toString());
                     }
 
                     case 4 -> {
@@ -519,8 +521,10 @@ public class Administrator {
         System.out.println("Please enter new machine's number of slots: ");
         Scanner machine_NumOfS = new Scanner(System.in);
         System.out.println("Please enter new machine's warehouse id: ");
+        //todo its limited number, add choices with names
         Scanner machine_WID = new Scanner(System.in);
         System.out.println("Please enter new machine's status: ");
+        //todo its limited number, add choices with names
         Scanner machine_status = new Scanner(System.in);
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Vending_Machine VALUES(" +
@@ -550,6 +554,7 @@ public class Administrator {
         System.out.println("Please enter new item's name: ");
         Scanner item_name = new Scanner(System.in);
         System.out.println("Please enter new item's supplier id: ");
+        //todo its limited number, add choices with names
         Scanner item_SID = new Scanner(System.in);
         System.out.println("Please enter new item's price: ");
         Scanner item_pr = new Scanner(System.in);
@@ -583,6 +588,7 @@ public class Administrator {
         System.out.println("Please enter new technician's name: ");
         Scanner technician_name = new Scanner(System.in);
         System.out.println("Please enter new technician's warehouse id: ");
+        //todo its limited number, add choices with names
         Scanner technician_WID = new Scanner(System.in);
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
@@ -626,6 +632,39 @@ public class Administrator {
             pstmt = Conn.prepareStatement("DELETE FROM Supplier WHERE Supplier_ID= " + supplier_ID);
             ResultSet rset1 = pstmt.executeQuery();
             //todo maybe create separate function to delete items bc it will be used above
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void createJob(){
+        System.out.println("Please enter new Job's id: ");
+        //todo check whether it already exists
+        Scanner job_ID = new Scanner(System.in);
+        System.out.println("Please enter new Job's type: ");
+        Scanner job_type = new Scanner(System.in);
+        System.out.println("Please enter new Job's deadline: ");
+        Scanner job_deadline = new Scanner(System.in);
+        //todo date is today and status to do
+        System.out.println("Please enter new technician's ID assigned to the Job: ");
+        //todo check whether exists
+        Scanner job_TID = new Scanner(System.in);
+        try {
+            pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +job_ID+", "+ date + job_type+", "
+                    +job_deadline+", "+status+", "+job_TID+", "+")");
+            ResultSet rset = pstmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Something is wrong with SQL.");
+        }
+    }
+
+    public void deleteJob(String job_ID){
+        try {
+            pstmt = Conn.prepareStatement("UPDATE Task SET Task_Status  = "
+                    + "'Canceled' WHERE Task_ID = " + job_ID);
+            ResultSet rset = pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
