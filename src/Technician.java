@@ -1,6 +1,5 @@
 import java.util.*;
 import java.sql.*;
-import java.sql.PreparedStatement;
 
 import oracle.jdbc.OracleConnection;
 
