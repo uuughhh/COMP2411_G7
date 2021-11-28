@@ -530,9 +530,6 @@ public class Administrator {
         System.out.println("Please enter new machine's number of slots: ");
         Scanner machine_NumOfS = new Scanner(System.in);
 
-
-
-
         pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse");
         rset = pstmt.executeQuery();
 
@@ -608,8 +605,6 @@ public class Administrator {
         System.out.println("Please enter new item's name: ");
         Scanner item_name = new Scanner(System.in);
 
-
-
         pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier");
         rset = pstmt.executeQuery();
 
@@ -668,28 +663,46 @@ public class Administrator {
 
     public void createTechnician() throws SQLException {
         System.out.println("Please enter new technician's id: ");
-
         Scanner technician_ID = new Scanner(System.in);
-        pstmt = Conn.prepareStatement("SELECT Technician_ID WHERE Technician_ID = " + technician_ID + "FROM Technician");
-        // check whether it already exists
-        while (pstmt != null){
+
+        pstmt = Conn.prepareStatement("SELECT * FROM Technician " +
+                "WHERE Technician_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(technician_ID.toString()));
+        ResultSet rset = pstmt.executeQuery();
+
+        while (rset != null){
             System.out.println("ID already exists, please enter another number: ");
             technician_ID = new Scanner(System.in);}
+
 
         System.out.println("Please enter new technician's name: ");
         Scanner technician_name = new Scanner(System.in);
 
+
         pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse");
-        ResultSet rset = pstmt.executeQuery();
-        System.out.println(rset.getString(1));
-        System.out.println("Please choose new technician's warehouse id from the above: ");
-        //todo input validation
+        rset = pstmt.executeQuery();
+
+        while (rset.next()) {
+            System.out.println(rset.getString(1));
+        }
+        System.out.println("Please select on of the new technician's warehouse id above: ");
         Scanner technician_WID = new Scanner(System.in);
+        pstmt = Conn.prepareStatement("SELECT Warehouse_ID FROM Warehouse " +
+                "WHERE Warehouse_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(technician_WID.toString()));
+        rset = pstmt.executeQuery();
+
+        while (rset == null){
+            System.out.println("Warehouse does not exist");
+            technician_WID = new Scanner(System.in);}
 
 
         try {
-            pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
-            ResultSet rset1 = pstmt.executeQuery();
+            pstmt = Conn.prepareStatement("INSERT INTO Technician VALUES(?, ?, ?)");
+            pstmt.setInt(1, Integer.parseInt(technician_ID.toString()));
+            pstmt.setString(2, technician_name.toString());
+            pstmt.setInt(3, Integer.parseInt(technician_WID.toString()));
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
