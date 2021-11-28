@@ -624,14 +624,6 @@ public class Administrator {
             item_SID = new Scanner(System.in);
         }
 
-        /*pstmt = Conn.prepareStatement("SELECT Supplier_ID FROM  Supplier");
-        rset = pstmt.executeQuery();
-        while (rset.next()) {
-            System.out.println(rset.getString(1));
-        }
-        System.out.println("Please choose new item's supplier id from the above: ");
-        Scanner item_SID = new Scanner(System.in);*/
-
         System.out.println("Please enter new item's price: ");
         Scanner item_pr = new Scanner(System.in);
 
