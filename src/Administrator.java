@@ -765,27 +765,41 @@ public class Administrator {
 
     public void createJob() throws SQLException {
         System.out.println("Please enter new Job's id: ");
-
         Scanner job_ID = new Scanner(System.in);
-        pstmt = Conn.prepareStatement("SELECT Task_ID WHERE Task_ID = " + job_ID + "FROM Task");
-        // check whether it already exists
-        while (pstmt != null){
+
+        pstmt = Conn.prepareStatement("SELECT * FROM Task " +
+                "WHERE Task_ID = ?");
+        pstmt.setInt(1, Integer.parseInt(job_ID.toString()));
+        ResultSet rset = pstmt.executeQuery();
+
+        while (rset != null){
             System.out.println("ID already exists, please enter another number: ");
-            job_ID = new Scanner(System.in);
-        }
+            job_ID = new Scanner(System.in);}
+
 
         System.out.println("Please enter new Job's type: ");
         Scanner job_type = new Scanner(System.in);
+
         System.out.println("Please enter new Job's deadline: ");
         Scanner job_deadline = new Scanner(System.in);
+
+
         System.out.println("Please enter new technician's ID assigned to the Job: ");
         //todo check whether exists
         Scanner job_TID = new Scanner(System.in);
+
         String date=java.time.LocalDate.now().toString();
+        //todo check format
         try {
             pstmt = Conn.prepareStatement("INSERT INTO Supplier VALUES(" +job_ID+", "+ date + job_type+", "
                     +job_deadline+", "+"'To be assigned'"+", "+job_TID+", "+")");
-            ResultSet rset = pstmt.executeQuery();
+            pstmt.setInt(1, Integer.parseInt(job_ID.toString()));
+            pstmt.setString(2, date);
+            pstmt.setInt(3, Integer.parseInt(job_type.toString()));
+            pstmt.setInt(4, Integer.parseInt(job_deadline.toString()));
+            pstmt.setString(5, "To be assigned");
+            pstmt.setInt(6, Integer.parseInt(job_TID.toString()));
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
