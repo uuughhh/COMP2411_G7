@@ -1,11 +1,12 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 import java.io.Console;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import oracle.jdbc.OracleConnection;
+import oracle.jdbc.driver.*;
 import oracle.sql.*;
 public class Administrator {
 
@@ -55,9 +56,35 @@ public class Administrator {
                                 "else enter 1 to add new machine");
                         Scanner machine = new Scanner(System.in);
                         if (machine.nextLine().equals("1")) {
+                            System.out.println("Please enter new machine's id: ");
+                            //todo check whether it already exists
+                            Scanner machine_ID = new Scanner(System.in);
+                            System.out.println("Please enter new machine's address: ");
+                            Scanner machine_adress = new Scanner(System.in);
+                            System.out.println("Please enter new machine's number of slots: ");
+                            Scanner machine_NumOfS = new Scanner(System.in);
+                            System.out.println("Please enter new machine's warehouse id: ");
+                            Scanner machine_WID = new Scanner(System.in);
+                            System.out.println("Please enter new machine's status: ");
+                            Scanner machine_status = new Scanner(System.in);
+                            try {
+                                ResultSet rset = stmt.executeQuery("INSERT INTO Vending_Machine VALUES(" +
+                                        machine_ID+", "+ machine_adress+ ", "+machine_NumOfS+ ", "+ machine_WID+", "+machine_status+")");
 
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
                         }
-                        else this.checkVMachine(machine.nextLine());
+                        else {
+                            try {
+                                ResultSet rset = stmt.executeQuery("UPDATE Vending_Machine SET chk_Machine_Status  = "
+                                        + "'Out of Order' WHERE Vending_Machine_ID = " + machine);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Something is wrong with SQL.");
+                            }
+                        }
                         //todo should i add while loop for several updates in a row
                     }
 
@@ -85,12 +112,13 @@ public class Administrator {
                         else {
                             //todo only if its not available in machines (quantity == 0)
                             try {
-                                ResultSet rset = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
-                                //todo what to do with delivery invoice
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                                System.out.println("Something is wrong with SQL.");
-                            }
+                                //todo should i delete delivery invoices
+                                ResultSet rset = stmt.executeQuery("DELETE FROM Delivery_Invoice WHERE Item_ID= " + item);
+                                ResultSet rset1 = stmt.executeQuery("DELETE FROM Item WHERE Item_ID= " + item);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.out.println("Something is wrong with SQL.");
+                        }
                         }
                     }
 
@@ -112,7 +140,7 @@ public class Administrator {
                             System.out.println("Please enter new technician's warehouse id: ");
                             Scanner technician_WID = new Scanner(System.in);
                             try {
-                                ResultSet rset = stmt.executeQuery("INSERT INTO Item VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
+                                ResultSet rset = stmt.executeQuery("INSERT INTO Technician VALUES(" +technician_ID+", "+ technician_name+ ", "+technician_WID+")");
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Something is wrong with SQL.");
@@ -320,6 +348,8 @@ public class Administrator {
             e.printStackTrace();
             System.out.println("Something is wrong with SQL.");
         }
+
+
     }
 
     public void checkMachineRefill (String machineNum)  {
